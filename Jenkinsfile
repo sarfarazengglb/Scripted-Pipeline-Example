@@ -19,10 +19,9 @@ node('windows') {
     stage('Archive') {
         archiveArtifacts artifacts: 'build/**'
     }
+  
 
-    stage('Fingerprint') {
-        fingerprint files: 'build/**'
-    }
+   
 }
 
 post {
