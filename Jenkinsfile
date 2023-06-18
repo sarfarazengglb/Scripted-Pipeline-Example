@@ -1,52 +1,72 @@
-node {
-    stage('Checkout') {
-        git branch: 'main', url: 'https://github.com/sarfarazengglb/Scripted-Pipeline-Example.git'
-    }
-    
-    stage('Clean') {
-        cleanWs()
-    }
-    
-    stage('Build') {
-        if (isUnix()) {
-            sh 'npm install'
-            sh 'npm run build'
-        } else {
-            bat 'npm install'
-            bat 'npm run build'
-        }
-    }
-    
-    stage('Test') {
-        if (isUnix()) {
-            sh 'npm run test'
-        } else {
-            bat 'npm run test'
-        }
-    }
-    
-    stage('Archive') {
-        archiveArtifacts artifacts: 'build/**'
-    }
-    
-    stage('Fingerprint') {
-        fingerprint files: 'build/**'
-    }
-}
+pipeline {
+    agent any
 
-post {
-    always {
-        // Perform any cleanup or finalization steps here
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/sarfarazengglb/Scripted-Pipeline-Example.git'
+            }
+        }
+
+        stage('Clean') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'npm install'
+                        sh 'npm run build'
+                    } else {
+                        bat 'npm install'
+                        bat 'npm run build'
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'npm run test'
+                    } else {
+                        bat 'npm run test'
+                    }
+                }
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: 'build/**'
+            }
+        }
+
+        stage('Fingerprint') {
+            steps {
+                fingerprint files: 'build/**'
+            }
+        }
     }
-    
-    success {
-        // Actions to take when the pipeline succeeds
-        echo 'Pipeline succeeded!'
-    }
-    
-    failure {
-        // Actions to take when the pipeline fails
-        echo 'Pipeline failed!'
+
+    post {
+        always {
+            // Perform any cleanup or finalization steps here
+        }
+
+        success {
+            // Actions to take when the pipeline succeeds
+            echo 'Pipeline succeeded!'
+        }
+
+        failure {
+            // Actions to take when the pipeline fails
+            echo 'Pipeline failed!'
+        }
     }
 }
 
@@ -55,7 +75,7 @@ def isUnix() {
 }
 
 def isUnixAgent() {
-    return agent.platform == 'unix' || agent.label == null
+    return isUnix() && (agent.platform == 'unix' || agent.label == null)
 }
 
 def isUnixShell() {
