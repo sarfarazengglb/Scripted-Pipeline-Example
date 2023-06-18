@@ -1,10 +1,10 @@
 node('windows') {
-    stage('Checkout') {
-        git branch: 'main', url: 'https://github.com/sarfarazengglb/Scripted-Pipeline-Example.git'
-    }
-
+   
     stage('Clean') {
         cleanWs()
+    }
+   stage('Checkout') {
+        git branch: 'main', url: 'https://github.com/sarfarazengglb/Scripted-Pipeline-Example.git'
     }
 
     stage('Build') {
