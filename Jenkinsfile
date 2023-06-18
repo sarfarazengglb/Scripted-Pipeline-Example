@@ -1,4 +1,4 @@
-node {
+node('windows') {
     stage('Checkout') {
         git branch: 'main', url: 'https://github.com/sarfarazengglb/Scripted-Pipeline-Example.git'
     }
@@ -8,21 +8,12 @@ node {
     }
 
     stage('Build') {
-        if (isUnix()) {
-            sh 'npm install'
-            sh 'npm run build'
-        } else {
-            bat 'npm install'
-            bat 'npm run build'
-        }
+        bat 'npm install'
+        bat 'npm run build'
     }
 
     stage('Test') {
-        if (isUnix()) {
-            sh 'npm run test'
-        } else {
-            bat 'npm run test'
-        }
+        bat 'npm run test'
     }
 
     stage('Archive') {
@@ -48,32 +39,4 @@ post {
         // Actions to take when the pipeline fails
         echo 'Pipeline failed!'
     }
-}
-
-def isUnix() {
-    return isUnixAgent() || isUnixShell()
-}
-
-def isUnixAgent() {
-    return agent.platform == 'unix' || agent.label == null
-}
-
-def isUnixShell() {
-    return isUnix() && (isSh() || isBash() || isGitBash())
-}
-
-def isSh() {
-    return isShell('sh')
-}
-
-def isBash() {
-    return isShell('bash')
-}
-
-def isGitBash() {
-    return isShell('bash.exe') || isShell('gitbash.exe')
-}
-
-def isShell(shellName) {
-    return env.PATH?.toLowerCase()?.contains(shellName)
 }
