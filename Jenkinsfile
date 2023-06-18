@@ -1,72 +1,52 @@
-pipeline {
-    agent any
+node {
+    stage('Checkout') {
+        git branch: 'main', url: 'https://github.com/sarfarazengglb/Scripted-Pipeline-Example.git'
+    }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/sarfarazengglb/Scripted-Pipeline-Example.git'
-            }
-        }
+    stage('Clean') {
+        cleanWs()
+    }
 
-        stage('Clean') {
-            steps {
-                cleanWs()
-            }
-        }
-
-        stage('Build') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh 'npm install'
-                        sh 'npm run build'
-                    } else {
-                        bat 'npm install'
-                        bat 'npm run build'
-                    }
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh 'npm run test'
-                    } else {
-                        bat 'npm run test'
-                    }
-                }
-            }
-        }
-
-        stage('Archive') {
-            steps {
-                archiveArtifacts artifacts: 'build/**'
-            }
-        }
-
-        stage('Fingerprint') {
-            steps {
-                fingerprint files: 'build/**'
-            }
+    stage('Build') {
+        if (isUnix()) {
+            sh 'npm install'
+            sh 'npm run build'
+        } else {
+            bat 'npm install'
+            bat 'npm run build'
         }
     }
 
-    post {
-        always {
-            // Perform any cleanup or finalization steps here
+    stage('Test') {
+        if (isUnix()) {
+            sh 'npm run test'
+        } else {
+            bat 'npm run test'
         }
+    }
 
-        success {
-            // Actions to take when the pipeline succeeds
-            echo 'Pipeline succeeded!'
-        }
+    stage('Archive') {
+        archiveArtifacts artifacts: 'build/**'
+    }
 
-        failure {
-            // Actions to take when the pipeline fails
-            echo 'Pipeline failed!'
-        }
+    stage('Fingerprint') {
+        fingerprint files: 'build/**'
+    }
+}
+
+post {
+    always {
+        // Perform any cleanup or finalization steps here
+    }
+
+    success {
+        // Actions to take when the pipeline succeeds
+        echo 'Pipeline succeeded!'
+    }
+
+    failure {
+        // Actions to take when the pipeline fails
+        echo 'Pipeline failed!'
     }
 }
 
@@ -75,7 +55,7 @@ def isUnix() {
 }
 
 def isUnixAgent() {
-    return isUnix() && (agent.platform == 'unix' || agent.label == null)
+    return agent.platform == 'unix' || agent.label == null
 }
 
 def isUnixShell() {
