@@ -1,4 +1,4 @@
-node('windows') {
+node() {
    
     stage('Clean') {
         cleanWs()
