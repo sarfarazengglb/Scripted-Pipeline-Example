@@ -1,27 +1,34 @@
 node {
-   
     stage('Clean') {
         cleanWs()
     }
-   stage('Checkout') {
+    stage('Checkout') {
         git branch: 'main', url: 'https://github.com/sarfarazengglb/Scripted-Pipeline-Example.git'
     }
 
     stage('Build') {
-        bat 'npm install'
-        bat 'npm run build'
+        // Use the appropriate shell based on the operating system
+        if (isUnix()) {
+            sh 'npm install'
+            sh 'npm run build'
+        } else {
+            bat 'npm install'
+            bat 'npm run build'
+        }
     }
 
     stage('Test') {
-        bat 'npm run test'
+        // Use the appropriate shell based on the operating system
+        if (isUnix()) {
+            sh 'npm run test'
+        } else {
+            bat 'npm run test'
+        }
     }
 
     stage('Archive') {
         archiveArtifacts artifacts: 'build/**'
     }
-  
-
-   
 }
 
 post {
