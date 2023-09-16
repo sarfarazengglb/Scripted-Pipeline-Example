@@ -1,4 +1,6 @@
 node {
+    def nodejs = tool name: 'NodeJS', type: 'Tool'
+    env.PATH = "${nodejs}/bin:${env.PATH}"
     stage('Clean') {
         cleanWs()
     }
